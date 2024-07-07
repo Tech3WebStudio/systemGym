@@ -30,7 +30,7 @@ const FormMember = () => {
       <div className="text-center mt-16 text-4xl">
         <label htmlFor="ingresar">Ingresar</label>
         <input
-          type="number"
+          type="text"
           name="dni"
           value={dni}
           onChange={handleChange}

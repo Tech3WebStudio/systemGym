@@ -158,9 +158,11 @@ export const newMember = (formData) => async (dispatch) => {
   }
 };
 
-export const authMember = (formData) => async () => {
+export const authMember = (dni) => async () => {
   try {
-    const response = await axios.post(`${rutaBack}/user/auth/member`, formData);
+    const response = await axios.post(`${rutaBack}/user/auth/member`, {
+      dni:dni
+    });
     console.log(response);
     // if (response.data) { 
     //   dispatch({

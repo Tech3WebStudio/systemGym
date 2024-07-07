@@ -102,6 +102,7 @@ userRoutes.post("/reset-password", async (req, res) => {
 userRoutes.post("/auth/member", async (req, res) => {
   try {
     const { dni } = req.body;
+    console.log(dni)
     const userData = await authMember(dni);
     return res.status(200).json(userData);
   } catch (error) {

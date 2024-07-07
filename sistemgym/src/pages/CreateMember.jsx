@@ -7,7 +7,7 @@ const CreateMember = () => {
 
   return (
     <Layout isAuth={isAuth}>
-      <div className="mt-8 border shadow-lg bg-gray-50">
+      <div className="mt-8 border p-8 shadow-lg max-w-screen-lg bg-gray-50 flex justify-center items-center">
         <FormCreateMember />
       </div>
     </Layout>
