@@ -2,7 +2,7 @@ const { User } = require("../../db.js"); // Asegúrate de que sea 'User' con la 
 
 const getMembers = async () => {
   const allUsers = await User.findAll({
-    where: { role: "user" }, // Cambiado 'rol' a 'role'
+    where: { role: "user", isActive: true }, // Cambiado 'rol' a 'role'
   });
   return allUsers;
 };

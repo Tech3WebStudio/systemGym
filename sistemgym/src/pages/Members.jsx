@@ -1,9 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Layout } from "../components/Layout/Layout";
 import { useEffect, useState } from "react";
-import { getAllMembers } from "../redux/actions/actions";
+import { deleteMember, getAllMembers } from "../redux/actions/actions";
 import { Link } from "react-router-dom";
 import TabInfoMember from "../components/Popups/TabInfoMember";
+import Swal from "sweetalert2";
 
 const Members = () => {
   const isAuth = useSelector((state) => state.auth.isAuth);
@@ -13,10 +14,10 @@ const Members = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const membersPerPage = 5;
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState(null)
+  const [selectedMember, setSelectedMember] = useState(null);
 
   const toggleModal = (member) => {
-    setSelectedMember(member)
+    setSelectedMember(member);
     setIsOpen(!isOpen);
   };
 
@@ -48,9 +49,61 @@ const Members = () => {
     }
   };
 
+  const handleDeleteMember = (id) => {
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger",
+      },
+      buttonsStyling: false,
+    });
+
+    swalWithBootstrapButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            dispatch(deleteMember(id));
+            swalWithBootstrapButtons.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+          } catch (error) {
+            Swal.fire({
+              title: "Error!",
+              text: `${error.message}`,
+              icon: "error",
+              confirmButtonText: "Cool",
+            });
+          }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithBootstrapButtons.fire({
+            title: "Cancelled",
+            text: "Your imaginary file is safe :)",
+            icon: "error",
+          });
+        }
+      });
+  };
+
   return (
     <Layout isAuth={isAuth}>
-      {isOpen && <TabInfoMember isOpen={isOpen} onClose={toggleModal} member={selectedMember} />}
+      {isOpen && (
+        <TabInfoMember
+          isOpen={isOpen}
+          onClose={toggleModal}
+          member={selectedMember}
+        />
+      )}
       <div className="flex justify-between">
         <h1 className="text-gray-400">Members</h1>
         <Link
@@ -85,7 +138,10 @@ const Members = () => {
                   </span>
                 </td>
                 <td className="flex gap-2">
-                  <button onClick={() => toggleModal(member)} className="p-2 rounded-full border hover:border-gray-400">
+                  <button
+                    onClick={() => toggleModal(member)}
+                    className="p-2 rounded-full border hover:border-gray-400"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -101,7 +157,10 @@ const Members = () => {
                       />
                     </svg>
                   </button>
-                  <button className="p-2 rounded-full border border-red-400 text-red-400 hover:border-red-600 hover:text-red-600">
+                  <button
+                    onClick={() => handleDeleteMember(member.id)}
+                    className="p-2 rounded-full border border-red-400 text-red-400 hover:border-red-600 hover:text-red-600"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"

@@ -15,6 +15,7 @@ export const RESET_PASS = "RESET_PASS";
 export const AUTH_MEMBER = "AUTH_MEMBER";
 export const NEW_MEMBER = "NEW_MEMBER";
 export const ALL_MEMBERS = "ALL_MEMBERS";
+export const DELETED_MEMBER = "DELETED_MEMBER";
 
 export const login = (formData) => async (dispatch) => {
   const endpoint = `${rutaBack}/login/`;
@@ -202,12 +203,29 @@ export const authMember = (dni) => async () => {
 export const getAllMembers = () => async (dispatch) => {
   try {
     const response = await axios.get(`${rutaBack}/user/members`)
-    console.log(response)
     dispatch({
       type: ALL_MEMBERS,
       payload: response.data
     })
   } catch (error) {
     console.log(error.message)
+  }
+}
+
+export const deleteMember = (id) => async(dispatch) => {
+  try {
+    const response = await axios.delete(`${rutaBack}/user/member/${id}`)
+    console.log(response)
+    dispatch({
+      type: DELETED_MEMBER,
+      payload: response
+    })
+  } catch (error) {
+    Swal.fire({
+      title: 'Error!',
+      text: `${error.message}`,
+      icon: 'error',
+      confirmButtonText: 'Cool'
+    })
   }
 }

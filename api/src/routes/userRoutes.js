@@ -9,6 +9,7 @@ const forgotPassword = require("../controllers/userControllers/forgotPassword");
 const resetPassword = require("../controllers/userControllers/resetPassword");
 const authMember = require("../controllers/userControllers/authMember");
 const createMember = require("../controllers/userControllers/createMember");
+const deleteMember = require("../controllers/userControllers/deleteMember");
 
 userRoutes.post("/", async (req, res) => {
   try {
@@ -35,6 +36,17 @@ userRoutes.post("/newmember", async (req, res) => {
       dni,
       phone,
     });
+    return res.status(200).json(newUser);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+userRoutes.delete("/member/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    const newUser = await deleteMember(id);
     return res.status(200).json(newUser);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -102,7 +114,7 @@ userRoutes.post("/reset-password", async (req, res) => {
 userRoutes.post("/auth/member", async (req, res) => {
   try {
     const { dni } = req.body;
-    console.log(dni)
+    console.log(dni);
     const userData = await authMember(dni);
     return res.status(200).json(userData);
   } catch (error) {

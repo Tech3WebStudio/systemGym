@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
     phone: { type: DataTypes.STRING, allowNull: true },
     isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
     role: {
-      type: DataTypes.ENUM("user", "admin"),
+      type: DataTypes.ENUM("user", "admin", "staff"),
       defaultValue: "user",
       allowNull: true,
     },
