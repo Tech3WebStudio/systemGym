@@ -3,6 +3,7 @@ import { Layout } from "../components/Layout/Layout";
 import { useEffect, useState } from "react";
 import { getAllMembers } from "../redux/actions/actions";
 import { Link } from "react-router-dom";
+import TabInfoMember from "../components/Popups/TabInfoMember";
 
 const Members = () => {
   const isAuth = useSelector((state) => state.auth.isAuth);
@@ -11,6 +12,13 @@ const Members = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const membersPerPage = 5;
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null)
+
+  const toggleModal = (member) => {
+    setSelectedMember(member)
+    setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
     dispatch(getAllMembers());
@@ -19,7 +27,10 @@ const Members = () => {
   // Calcular los miembros a mostrar en la página actual
   const indexOfLastMember = currentPage * membersPerPage;
   const indexOfFirstMember = indexOfLastMember - membersPerPage;
-  const currentMembers = allMembers.slice(indexOfFirstMember, indexOfLastMember);
+  const currentMembers = allMembers.slice(
+    indexOfFirstMember,
+    indexOfLastMember
+  );
 
   // Calcular el número total de páginas
   const totalPages = Math.ceil(allMembers.length / membersPerPage);
@@ -39,6 +50,7 @@ const Members = () => {
 
   return (
     <Layout isAuth={isAuth}>
+      {isOpen && <TabInfoMember isOpen={isOpen} onClose={toggleModal} member={selectedMember} />}
       <div className="flex justify-between">
         <h1 className="text-gray-400">Members</h1>
         <Link
@@ -73,7 +85,7 @@ const Members = () => {
                   </span>
                 </td>
                 <td className="flex gap-2">
-                  <button className="p-2 rounded-full border hover:border-gray-400">
+                  <button onClick={() => toggleModal(member)} className="p-2 rounded-full border hover:border-gray-400">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
