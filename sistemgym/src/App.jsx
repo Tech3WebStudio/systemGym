@@ -1,10 +1,36 @@
+import { Route, Routes } from "react-router-dom";
+import { Dashboard } from "./pages/Dashboard";
+import { Login } from "./pages/Login";
+import { SingUp } from "./pages/SingUp";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { isAuthenticated } from "./redux/actions/actions";
+import jwtToken from "./components/getCookie";
+import Income from "./pages/Income";
+import Members from "./pages/Members";
+import CreateMember from "./pages/CreateMember";
+
 function App() {
+  const dispatch = useDispatch();
+  const isAuth = useSelector((state) => state.auth.isAuth);
+
+  useEffect(() => {
+    dispatch(isAuthenticated(jwtToken));
+  }, [dispatch]);
+
   return (
-    <div className="flex justify-center items-center w-screen">
-      <div className="flex">
-        <h1 className="text-3xl font-bold underline">Hello world!</h1>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/register" element={<SingUp />} />
+      <Route path="/income" element={<Income />} />
+      {isAuth && (
+        <>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/members" element={<Members />} />
+          <Route path="/createmember" element={<CreateMember />} />
+        </>
+      )}
+    </Routes>
   );
 }
 
