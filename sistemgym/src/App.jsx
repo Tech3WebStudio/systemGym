@@ -9,6 +9,8 @@ import jwtToken from "./components/getCookie";
 import Income from "./pages/Income";
 import Members from "./pages/Members";
 import CreateMember from "./pages/CreateMember";
+import Payments from "./pages/Payments";
+import Classes from "./pages/Classes";
 
 function App() {
   const dispatch = useDispatch();
@@ -28,6 +30,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/members" element={<Members />} />
           <Route path="/createmember" element={<CreateMember />} />
+          <Route path="/classes" element={<Classes />} />
+          <Route path="/payment" element={<Payments />} />
         </>
       )}
     </Routes>
