@@ -10,7 +10,7 @@ export function Layout({ children, isAuth}) {
     )
   }
   return (
-    <div id="view" className="h-full w-screen flex flex-row">
+    <div id="view" className="h-full w-full flex flex-row">
       <div className="md:hidden flex items-center justify-center p-4">
         <button className="p-2 border-2 bg-white rounded-md border-gray-200 shadow-lg text-gray-500 focus:bg-teal-500 focus:outline-none focus:text-white absolute top-0 left-0 sm:hidden">
           <svg
