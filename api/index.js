@@ -30,7 +30,7 @@ async function createDatabase() {
 
 async function startServer() {
   await createDatabase();
-  conn.sync({ force: false }).then(() => {
+  conn.sync({ alter: true }).then(() => {
     server.listen(port, () => {
       console.log(`Server listening on port ${port}`);
     });

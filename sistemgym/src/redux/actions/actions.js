@@ -16,6 +16,9 @@ export const AUTH_MEMBER = "AUTH_MEMBER";
 export const NEW_MEMBER = "NEW_MEMBER";
 export const ALL_MEMBERS = "ALL_MEMBERS";
 export const DELETED_MEMBER = "DELETED_MEMBER";
+export const CLASSES_CREATED = "CLASSES_CREATED";
+export const ALL_CLASSES = "ALL_CLASSES";
+
 
 export const login = (formData) => async (dispatch) => {
   const endpoint = `${rutaBack}/login/`;
@@ -227,5 +230,33 @@ export const deleteMember = (id) => async(dispatch) => {
       icon: 'error',
       confirmButtonText: 'Cool'
     })
+  }
+}
+
+export const createClasses = (formData) => async(dispatch) => {
+  try {
+    const response = await axios.post(`${rutaBack}/classes/`, formData)
+    console.log(response)
+
+    dispatch({
+      type: CLASSES_CREATED,
+      payload: response.data
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const allClasses = () => async(dispatch) => {
+  try {
+    const response = await axios.get(`${rutaBack}/classes/`);
+    console.log(response)
+
+    dispatch({
+      type: ALL_CLASSES,
+      payload: response.data
+    })
+  } catch (error) {
+    console.log(error)
   }
 }
