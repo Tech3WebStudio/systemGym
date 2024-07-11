@@ -31,55 +31,59 @@ const Classes = () => {
         </button>
       </div>
       <section className="pt-20 ">
-        <div className="container">
-          <div className="flex flex-wrap -mx-4">
-            {classes.length > 0 &&
-              classes.map((clase, i) => (
-                <div key={i} className="w-full md:w-1/2 xl:w-1/3 px-4">
-                  <div className="bg-gray-300 border shadow-md text-center rounded-lg overflow-hidden mb-10">
-                    
-                    <div className="p-8 sm:p-9 md:p-7 xl:p-9 text-center">
-                      <h3>
-                        <button
-                          className="
-                            font-semibold
-                            text-dark text-xl
-                            sm:text-[22px]
-                            md:text-xl
-                            lg:text-[22px]
-                            xl:text-xl
-                            2xl:text-[22px]
-                            mb-4
-                            block
-                            hover:text-primary
-                            "
-                        >
-                        {clase.nombre}
-                        </button>
-                      </h3>
-                      <p className="text-base text-body-color leading-relaxed mb-7">
-                        {clase.dias}
-                      </p>
-                      <button
-                        className="
-                         inline-block
-                         py-2
-                         px-7
-                         border border-[#E5E7EB]
-                         rounded-full
-                         text-base text-body-color
-                         font-medium
-                         hover:border-primary hover:bg-primary hover:text-white
-                         transition
-                         "
-                      >
-                        {clase.precio}
-                      </button>
-                    </div>
+        <div className="flex flex-wrap gap-4 justify-center items-center">
+          {classes.length > 0 &&
+            classes.map((clase, i) => (
+              <div key={i} className="bg-white rounded-lg shadow-lg max-w-60">
+                <div className="flex flex-col items-center p-10 bg-gray-200">
+                  <span className="font-semibold">{clase.nombre}</span>
+                  <div className="flex items-center">
+                    <span className="text-3xl">$</span>
+                    <span className="text-6xl font-bold">{clase.precio}</span>
+                    <span className="text-2xl text-gray-500">/ARS</span>
                   </div>
                 </div>
-              ))}
-          </div>
+                <div className="p-10">
+                  <ul>
+                    <li className="flex items-center">
+                      <svg
+                        className="w-5 h-5 text-green-600 fill-current"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="ml-2 italic">{clase.dias}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg
+                        className="w-5 h-5 text-green-600 fill-current"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="ml-2">{clase.plan}</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="flex px-10 pb-10 justfy-center">
+                  <button className="flex items-center justify-center w-full h-12 px-6 text-sm uppercase bg-gray-200 rounded-lg">
+                    Join now
+                  </button>
+                </div>
+              </div>
+            ))}
         </div>
       </section>
     </Layout>

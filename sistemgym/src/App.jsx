@@ -11,6 +11,7 @@ import Members from "./pages/Members";
 import CreateMember from "./pages/CreateMember";
 import Payments from "./pages/Payments";
 import Classes from "./pages/Classes";
+import Plans from "./pages/Plans";
 
 function App() {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ function App() {
           <Route path="/createmember" element={<CreateMember />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/payment" element={<Payments />} />
+          <Route path="/plans" element={<Plans />} />
         </>
       )}
     </Routes>

@@ -18,6 +18,8 @@ export const ALL_MEMBERS = "ALL_MEMBERS";
 export const DELETED_MEMBER = "DELETED_MEMBER";
 export const CLASSES_CREATED = "CLASSES_CREATED";
 export const ALL_CLASSES = "ALL_CLASSES";
+export const PLAN_CREATED = "PLAN_CREATED";
+export const ALL_PLANS = "ALL_PLANS";
 
 
 export const login = (formData) => async (dispatch) => {
@@ -258,5 +260,31 @@ export const allClasses = () => async(dispatch) => {
     })
   } catch (error) {
     console.log(error)
+  }
+}
+
+export const createPlans = (formData) => async(dispatch) => {
+  try {
+    const response = await axios.post(`${rutaBack}/plans/`, formData)
+    console.log(response)
+    dispatch({
+      type: PLAN_CREATED,
+      payload: response
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const allPlans = () => async(dispatch) => {
+  try {
+    const response = await axios.get(`${rutaBack}/plans/`)
+    console.log(response.data)
+    dispatch({
+      type: ALL_PLANS,
+      payload: response.data
+    })
+  } catch (error) {
+    console.log(error.message)
   }
 }

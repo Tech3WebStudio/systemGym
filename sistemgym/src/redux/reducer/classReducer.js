@@ -3,7 +3,7 @@ import { ALL_CLASSES, CLASSES_CREATED } from "../actions/actions";
 const initialState = {
   class: {},
   allClasses: [],
-  classCreated: true,
+  classCreated: false,
 };
 
 const classReducer = (state = initialState, action) => {
