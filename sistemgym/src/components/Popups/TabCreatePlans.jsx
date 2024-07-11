@@ -1,19 +1,20 @@
-import React, { useState } from "react";
-import useValidation from "./validationCreateClasses";
-import "react-multi-date-picker/styles/colors/teal.css";
+import { useState } from "react";
+import useValidation from "./validationCreatePlan";
 import { useDispatch } from "react-redux";
-import { createClasses } from "../../redux/actions/actions";
+import { createPlans } from "../../redux/actions/actions";
 
-const TabCreateClasses = ({ onClose }) => {
+const TabCreatePlan = ({ onClose }) => {
   const [formData, setFormData] = useState({
     nombre: "",
+    descripcion: "",
     precio: "",
-    plan: "",
     dias: "",
+    condiciones: "",
   });
   const [errors, setErrors] = useState({});
   const validationErrors = useValidation(formData);
   const dispatch = useDispatch();
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -28,7 +29,7 @@ const TabCreateClasses = ({ onClose }) => {
 
     if (Object.keys(validationErrors).length === 0) {
       console.log(formData);
-      dispatch(createClasses(formData))
+      dispatch(createPlans(formData));
     }
   };
 
@@ -47,17 +48,31 @@ const TabCreateClasses = ({ onClose }) => {
           </button>
         </div>
         <div className="mt-4 flex flex-col">
-          <label htmlFor="nombre">Nombre de la clase</label>
+          <label htmlFor="nombre">Nombre del plan</label>
           <input
             className="p-2 border border-gray-500 text-center"
             type="text"
             name="nombre"
             value={formData.nombre}
             onChange={handleChange}
-            placeholder="Pilates"
+            placeholder="Plan familiar"
           />
           {errors.nombre && (
             <span className="text-red-500">{errors.nombre}</span>
+          )}
+        </div>
+        <div className="mt-4 flex flex-col">
+          <label htmlFor="descripcion">Descripción del plan</label>
+          <textarea
+            className="p-2 border border-gray-500 text-center"
+            type="text"
+            name="descripcion"
+            value={formData.descripcion}
+            onChange={handleChange}
+            placeholder="Plan familiar a partir de 3 personas"
+          />
+          {errors.descripcion && (
+            <span className="text-red-500">{errors.descripcion}</span>
           )}
         </div>
         <div className="mt-4 flex flex-col">
@@ -75,31 +90,32 @@ const TabCreateClasses = ({ onClose }) => {
           )}
         </div>
         <div className="mt-4 flex flex-col">
-          <label htmlFor="plan">Plan</label>
-          <select
-            className="p-2 border border-gray-500 text-center"
-            name="plan"
-            value={formData.plan}
-            onChange={handleChange}
-          >
-            <option value="">Seleccione un plan</option>
-            <option value="plan1">Plan 1</option>
-            <option value="plan2">Plan 2</option>
-            <option value="plan3">Plan 3</option>
-          </select>
-          {errors.plan && <span className="text-red-500">{errors.plan}</span>}
-        </div>
-        <div className="mt-4 flex flex-col">
-          <label htmlFor="dias">Dias</label>
+          <label htmlFor="dias">Cantidad de días</label>
           <input
             className="p-2 border border-gray-500 text-center"
             type="text"
             name="dias"
             value={formData.dias}
             onChange={handleChange}
-            placeholder="Lunes, miercoles, viernes"
+            placeholder="30"
           />
-          {errors.dias && <span className="text-red-500">{errors.dias}</span>}
+          {errors.dias && (
+            <span className="text-red-500">{errors.dias}</span>
+          )}
+        </div>
+        <div className="mt-4 flex flex-col">
+          <label htmlFor="condiciones">Condiciones</label>
+          <textarea
+            className="p-2 border border-gray-500 text-center"
+            type="text"
+            name="condiciones"
+            value={formData.condiciones}
+            onChange={handleChange}
+            placeholder="Minimo 3 personas, m"
+          />
+          {errors.condiciones && (
+            <span className="text-red-500">{errors.condiciones}</span>
+          )}
         </div>
         <button className="border border-gray-500 p-2 bg-teal-500 text-gray-200 hover:text-white hover:bg-teal-700 shadow-sm">
           Crear
@@ -109,4 +125,4 @@ const TabCreateClasses = ({ onClose }) => {
   );
 };
 
-export default TabCreateClasses;
+export default TabCreatePlan;
