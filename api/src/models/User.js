@@ -16,6 +16,16 @@ module.exports = (sequelize) => {
       allowNull: true,
     },
     createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    planId: {  // Añadir este campo
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Plans', // Asegúrate de que el nombre del modelo esté en singular o plural según tu configuración
+        key: 'id'
+      },
+      allowNull: true,
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    },
   });
 
   return User;

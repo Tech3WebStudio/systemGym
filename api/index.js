@@ -28,15 +28,26 @@ async function createDatabase() {
   }
 }
 
-async function startServer() {
-  await createDatabase();
-  conn.sync({ force: false }).then(() => {
-    server.listen(port, () => {
-      console.log(`Server listening on port ${port}`);
-    });
-  }).catch(error => {
-    console.error('Unable to connect to the database:', error);
-  });
-}
 
-startServer();
+conn.authenticate()
+  .then(() => {
+    console.log('Conexión a la base de datos establecida correctamente.');
+  })
+  .catch(err => {
+    console.error('No se pudo conectar a la base de datos:', err);
+  });
+
+conn.sync({ force: false }).then(() => {
+  console.log('Base de datos sincronizada');
+  // Aquí puedes iniciar tu servidor o cualquier otra lógica que necesites después de sincronizar la DB.
+
+  server.listen(port, () => {
+    console.log(`Servidor escuchando en el puerto ${port}`);
+  });
+  
+}).catch(err => {
+  console.error('Error al sincronizar la base de datos:', err);
+})
+
+
+
