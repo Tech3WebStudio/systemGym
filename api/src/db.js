@@ -63,6 +63,7 @@ module.exports = {
   Access,
   Notice,
   SpecialGroup,
+  UserSpecialGroups,
   Routine,
   Plan,
   Stock,
