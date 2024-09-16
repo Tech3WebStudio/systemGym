@@ -1,7 +1,7 @@
-const { user } = require("../../db.js");
+const { User } = require("../../db.js");
 
 const getUserById = async (idUser) => {
-  const userById = await user.findByPk(idUser);
+  const userById = await User.findByPk(idUser);
   return userById;
 };
 

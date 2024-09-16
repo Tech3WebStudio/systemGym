@@ -1,11 +1,11 @@
-const { user } = require("../../db");
+const { User } = require("../../db");
 const jwt = require("jsonwebtoken");
 const transporter = require("../../helpers/nodemailer");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const forgotPassword = async (email) => {
-    const foundUser = await user.findOne({ where: { email } });
+    const foundUser = await User.findOne({ where: { email } });
     if (!foundUser) {
         throw new Error("User not found");
     };

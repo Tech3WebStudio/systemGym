@@ -1,4 +1,4 @@
-const { user } = require("../../db.js");
+const { User } = require("../../db.js");
 const bcryptjs = require("bcryptjs");
 const mayuscName = require("../../helpers/mayuscName.js");
 
@@ -7,7 +7,7 @@ const modifyUser = async (data) => {
     let { id_user, email, name, lastname, password, is_active, newPassword } =
       data;
 
-    const theUser = await user.findByPk(id_user);
+    const theUser = await User.findByPk(id_user);
     if (!theUser) throw new Error("User not found");
 
     // Check and update email if provided
@@ -15,7 +15,7 @@ const modifyUser = async (data) => {
       const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!regexEmail.test(email)) throw new Error("Invalid Email");
 
-      const existEmail = await user.findOne({ where: { email } });
+      const existEmail = await User.findOne({ where: { email } });
       if (existEmail && existEmail.id_user !== theUser.id_user) {
         throw new Error("The email is already associated with an account");
       }
@@ -46,12 +46,12 @@ const modifyUser = async (data) => {
         data.password = hashPassword;
       }
 
-      const [updated] = await user.update(data, {
+      const [updated] = await User.update(data, {
         where: { id_user },
       });
 
       if (updated) {
-        const updatedUser = await user.findByPk(id_user);
+        const updatedUser = await User.findByPk(id_user);
         return updatedUser;
       } else {
         throw new Error("User update failed");

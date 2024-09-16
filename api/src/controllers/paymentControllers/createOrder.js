@@ -12,7 +12,7 @@ const createOrder = async (req, res) => {
 
   const body = {
     transaction_amount: 5000,
-    description: "Pago mensual Gimnacio",
+    description: "Pago mensual Gimnasio",
     payer: {
       email: "niveyrojulian5@gmail.com",
     },

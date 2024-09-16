@@ -1,4 +1,4 @@
-const { user } = require("../../db");
+const { User } = require("../../db");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
 const dotenv = require("dotenv");
@@ -7,7 +7,7 @@ dotenv.config();
 const resetPassword = async (password, token) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const foundUser = await user.findByPk(decoded.id_user);
+        const foundUser = await User.findByPk(decoded.id_user);
     
         if (!foundUser) {
             throw new Error ("User not found");
