@@ -14,12 +14,23 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM("user", "admin", "staff"),
       defaultValue: "user",
       allowNull: true,
+    },hasPaid: { // Nuevo campo para controlar el pago de los usuarios
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
     createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    specialGroupId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'SpecialGroups', // Referencia al modelo de grupos
+        key: 'id'
+      },
+      allowNull: true
+    },
     planId: {  // Añadir este campo
       type: DataTypes.INTEGER,
       references: {
-        model: 'Plans', // Asegúrate de que el nombre del modelo esté en singular o plural según tu configuración
+        model: 'Plan', // Asegúrate de que el nombre del modelo esté en singular o plural según tu configuración
         key: 'id'
       },
       allowNull: true,
