@@ -2,8 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import validationRegister from "./validationRegister";
 import { register } from "../../redux/actions/actions";
+import {createUserWithEmailAndPassword} from 'firebase/auth'
+import {auth} from "../../firebase"
 
 export const FormRegister = () => {
+  const auth = getAuth();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: "",
@@ -35,6 +38,8 @@ export const FormRegister = () => {
     
     if (Object.keys(memoizedErrors).length === 0) {
       try {
+        await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        console.log("Usuario registrado con éxito", user.email);
         dispatch(register(formData));
       } catch (error) {
         console.log(error);

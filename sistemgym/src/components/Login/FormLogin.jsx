@@ -1,8 +1,12 @@
+import { GoogleAuthProvider } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/actions/actions";
 import validationLogin from "./validationLogin";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebase";
+import { signInWithPopup } from "firebase/auth";
 
 export const FormLogin = () => {
   const [formData, setFormData] = useState({
@@ -27,22 +31,39 @@ export const FormLogin = () => {
     validationLogin({ ...formData, [name]: value }, errors, setErrors);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     validationLogin(formData, errors, setErrors);
     const noErrors = Object.keys(errors).every((key) => errors[key] === "");
 
     if (noErrors) {
       try {
+        await signInWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
         dispatch(login(formData));
 
-        setTimeout(() => {
+        /*setTimeout(() => {
           window.location.reload();
-        }, 2000);
+        }, 2000);*/
       } catch (error) {
         console.log(error.message);
       }
     }
+  };
+
+  const handleLoginWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("Usuario de google", user);
+    } catch (error) {
+      console.log(error);
+    }
+    dispatch(login(formData));
   };
 
   useEffect(() => {
@@ -106,6 +127,7 @@ export const FormLogin = () => {
       >
         Login
       </button>
+      <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"onClick={handleLoginWithGoogle}>Iniciar sesión con Google</button>
     </form>
   );
 };

@@ -18,6 +18,7 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
     createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     specialGroupId: {
       type: DataTypes.INTEGER,

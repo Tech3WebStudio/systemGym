@@ -2,6 +2,7 @@ import axios from "axios";
 import { deleteSessionToken } from "../../components/delCookie";
 import Swal from 'sweetalert2';
 import rutaBack from "./rutaBack";
+
 export const REGISTER_SUCCESS = "REGISTER_SUCCESS";
 export const IS_AUTH = "IS_AUTH";
 export const ISNT_AUTH = "ISNT_AUTH";
@@ -128,6 +129,10 @@ export const resetPassword = (email) => async (dispatch) => {
     console.log(error.message);
   }
 };
+export const loginWithGoogle = (userInfo) => ({
+  type: LOGIN_WITH_GOOGLE,
+  payload: userInfo,
+});
 
 export const sendNewPassword = (formData) => async () => {
   const endpoint = `${rutaBack}/user/reset-password`;
