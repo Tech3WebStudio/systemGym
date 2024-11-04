@@ -4,7 +4,7 @@ import { Login } from "./pages/Login";
 import { SingUp } from "./pages/SingUp";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { isAuthenticated } from "./redux/actions/actions";
+import { authenticateUserFromSession } from "./redux/actions/actions";
 import jwtToken from "./components/getCookie";
 import Income from "./pages/Income";
 import Members from "./pages/Members";
@@ -17,7 +17,7 @@ function App() {
   const isAuth = useSelector((state) => state.auth.isAuth);
 
   useEffect(() => {
-    dispatch(isAuthenticated(jwtToken));
+    dispatch(authenticateUserFromSession(jwtToken));
   }, [dispatch]);
 
   return (

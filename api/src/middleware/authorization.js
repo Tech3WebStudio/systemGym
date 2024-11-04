@@ -1,56 +1,83 @@
-const jsonwebtoken = require("jsonwebtoken");
-const { user } = require("../db.js");
-const dotenv = require("dotenv");
+const admin = require("firebase-admin");
+const serviceAccount = require('../../serviceAccountKey.json'); // Ajusta la ruta al archivo
 
-dotenv.config();
-async function onlyAdmin(req, res, next) {
-  const logged = authCookie(req);
-  if (logged) return next();
-  return res.redirect("/home");
-}
+// Inicializa la aplicación de Firebase Admin con el archivo JSON
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
-function onlyPublic(req, res, next) {
-  const logged = authCookie(req);
-  if (!logged) return next();
-  return res.redirect("/");
-}
-
-async function authCookie(req) {
-    const { id_user } = req.body;
-    if (!req.headers.cookie || !req.headers.cookie.includes("jwt=")) {
-      return false; // Retorna falso si no se encontró la cookie
-    }
-  
-    try {
-      const cookieJWT = req.headers.cookie
-        .split("; ")
-        .find((cookie) => cookie.startsWith("jwt="))
-        .slice(4);
-      const cookieDecodificada = jsonwebtoken.verify(
-        cookieJWT,
-        process.env.JWT_SECRET
-      );
-      console.log("COOKIE: " + cookieJWT);
-  
-      const theUser = await user.findByPk(id_user);
-  
-      if (!theUser) {
-        console.log({ status: "Error", message: "Usuario no encontrado" });
-        return false; // Retorna falso si el usuario no se encontró
-      }
-      if (theUser.id_user !== cookieDecodificada.user) {
-        return false; // Retorna falso si el usuario no coincide con el de la cookie
-      }
-      
-      return true; // Retorna verdadero si todo está bien
-    } catch (error) {
-      console.error("Error durante la verificación:", error);
-      return false; // Retorna falso si hay un error durante la verificación
-    }
+async function authenticateToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send("Authorization header missing");
   }
-  
+  const token = authHeader.split(" ")[1];
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.user = decodedToken;
+
+    // Verifica si el usuario tiene permisos para acceder a los datos de Google Sheets
+    const allowedUsers = [
+      "niveyrojulian5@gmail.com",
+      "claudioarganaraz86@gmail.com",
+      "matiassjv@gmail.com"
+    ];
+    if (!allowedUsers.includes(decodedToken.email)) {
+      return res.status(403).send("Forbidden: User does not have access");
+    }
+
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(401).send("Unauthorized");
+  }
+}
+
+async function verifyToken(token) {
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    return decodedToken;
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    throw new Error("Token verification failed");
+  }
+}
+
+async function isAdmin(email) {
+  const adminEmails = [
+    "niveyrojulian5@gmail.com",
+    "sebastiannahuelmieres@gmail.com",
+    "matiascarballo433@gmail.com"
+  ];
+  return adminEmails.includes(email);
+}
+
+async function authMiddleware(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+
+  try {
+    const decodedToken = await verifyToken(token);
+    const email = decodedToken.email;
+
+    if (await isAdmin(email)) {
+      req.user = decodedToken;
+      next();
+    } else {
+      return res.status(403).json({ message: "User is not authorized" });
+    }
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    return res.status(401).json({ message: "Invalid token" });
+  }
+}
 
 module.exports = {
-  onlyAdmin,
-  onlyPublic,
+  authMiddleware,
+  verifyToken,
+  isAdmin,
+  authenticateToken,
 };

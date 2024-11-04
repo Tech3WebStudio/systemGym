@@ -1,49 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import validationRegister from "./validationRegister";
-import { register } from "../../redux/actions/actions";
-import {createUserWithEmailAndPassword} from 'firebase/auth'
-import {auth} from "../../firebase"
+import {createNewUser} from '../../firebase/auth'
 
 export const FormRegister = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const auth = getAuth();
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
 
   const [errors, setErrors] = useState({});
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const memoizedErrors = useMemo(() => {
-    return validationRegister(formData);
-  }, [formData]);
-
-  useEffect(() => {
-    setErrors(memoizedErrors);
-  }, [memoizedErrors]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (Object.keys(memoizedErrors).length === 0) {
-      try {
-        await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        console.log("Usuario registrado con éxito", user.email);
-        dispatch(register(formData));
-      } catch (error) {
-        console.log(error);
-      }
+    try {
+      const data = {
+        name: name,
+        email: email,
+        password: password,
+      };
+      await createNewUser(data, auth, dispatch);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -65,8 +44,8 @@ export const FormRegister = () => {
           name="name"
           id="name"
           placeholder="name"
-          value={formData.name}
-          onChange={handleChange}
+          value={name}
+          onChange={(e)=>setName(e.target.value)}
         />
         {errors.name && (
           <p className="text-red-500 text-xs italic">{errors.name}</p>
@@ -84,9 +63,9 @@ export const FormRegister = () => {
           type="text"
           name="email"
           id="email"
-          value={formData.email}
+          value={email}
           placeholder="@email"
-          onChange={handleChange}
+          onChange={(e)=>setEmail(e.target.value)}
         />
         {errors.email && (
           <p className="text-red-500 text-xs italic">{errors.email}</p>
@@ -103,37 +82,16 @@ export const FormRegister = () => {
           className="w-full bg-white px-4 py-2 rounded-lg focus:outline-none"
           type="password"
           name="password"
-          value={formData.password}
+          value={password}
           id="password"
           placeholder="password"
-          onChange={handleChange}
+          onChange={(e)=>setPassword(e.target.value)}
         />
         {errors.password && (
           <p className="text-red-500 text-xs italic">{errors.password}</p>
         )}
       </div>
-      <div className="mb-4">
-        <label
-          className="text-gray-800 font-semibold block my-3 text-md"
-          htmlFor="confirmPassword"
-        >
-          Confirm password
-        </label>
-        <input
-          className="w-full bg-white px-4 py-2 rounded-lg focus:outline-none"
-          type="password"
-          name="confirmPassword"
-          id="confirmPassword"
-          value={formData.confirmPassword}
-          placeholder="confirm password"
-          onChange={handleChange}
-        />
-        {errors.confirmPassword && (
-          <p className="text-red-500 text-xs italic">
-            {errors.confirmPassword}
-          </p>
-        )}
-      </div>
+     
       <button
         type="submit"
         className="w-full mt-6 bg-indigo-600 rounded-lg px-4 py-2 text-lg text-white tracking-wide font-semibold font-sans"

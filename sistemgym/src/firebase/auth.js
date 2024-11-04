@@ -1,3 +1,4 @@
+import CryptoJS from "crypto-js";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -6,14 +7,14 @@ import {
   signOut,
 } from "firebase/auth";
 import rutaBack from "../redux/actions/rutaBack";
-import { auth } from "./firebase.config";
+import { auth } from "./firebase";
 import store from "../redux/store";
 import {
   createUser,
   loginWithGoogle,
-} from "../redux/actions/authActions";
-import CryptoJS from "crypto-js";
-import toast from "react-hot-toast";
+  authenticateUserFromSession
+} from "../redux/actions/actions";
+
 
 export const doSignInWithGoogle = async () => {
   try {
@@ -30,7 +31,7 @@ export const doSignInWithGoogle = async () => {
     });
 
     if (response.ok) {
-      toast.success("Ingreso exitoso, redirigiendo..");
+     console.log( "Ingreso exitoso, redirigiendo..");
       const { theUser } = await response.json();
       const { uid, email, displayName, photoURL } = result.user;
 
@@ -114,7 +115,7 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
 
       const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
 
-      const hashedUserInfo = CryptoJS.AES.encrypt(
+      const hashedUserInfo = cryptoJS.AES.encrypt(
         JSON.stringify(userInfo),
         secretKey
       ).toString();
@@ -141,7 +142,7 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
   }
 };
 
-export const createNewSeller = async (newSeller) => {
+/*export const createNewSeller = async (newSeller) => {
   try {
     const { email, nombre, password, role } = newSeller;
     const userCredential = await createUserWithEmailAndPassword(
@@ -159,7 +160,7 @@ export const createNewSeller = async (newSeller) => {
     console.log("Error al crear nuevo vendedor:", error);
     toast.error("Error al crear nuevo vendedor");
   }
-};
+};*/
 
 export const createNewUser = async (newUser) => {
   try {

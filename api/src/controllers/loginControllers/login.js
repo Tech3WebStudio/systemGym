@@ -5,38 +5,41 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const login = async (email, password) => {
-  if (!email || !password) throw new Error("Incomplete data");
+  console.log("Intentando iniciar sesión con:", { email });
+  
+  if (!email || !password) {
+    console.error("Datos incompletos");
+    throw new Error("Incomplete data");
+  }
 
   const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!regexEmail.test(email)) throw new Error("Invalid email");
+  if (!regexEmail.test(email)) {
+    console.error("Email inválido:", email);
+    throw new Error("Invalid email");
+  }
 
-  const theUser = await User.findOne({
-    where: { email },
-  });
-  if (!theUser) throw new Error("Wrong email");
-
+  const theUser = await User.findOne({ where: { email } });
+  if (!theUser) {
+    console.error("Email incorrecto:", email);
+    throw new Error("Wrong email");
+  }
 
   const correctLogin = await bcryptjs.compare(password, theUser.password);
-  if (!correctLogin) throw new Error("Incorrect password");
+  if (!correctLogin) {
+    console.error("Contraseña incorrecta para el usuario:", email);
+    throw new Error("Incorrect password");
+  }
 
-  const token = jsonwebtoken.sign(
-    { user: theUser.id }, // Cambiado de theUser.id_user a theUser.id
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-  
+  const token = jsonwebtoken.sign({ user: theUser.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
   const cookieOption = {
     maxAge: 24 * 60 * 60 * 1000,
     path: "/",
-    sameSite: "Lax", // Asegúrate de que sea 'None' si estás usando cookies entre dominios
+    sameSite: "Lax",
     secure: false,
   };
 
-  return {
-    correctLogin,
-    token,
-    cookieOption,
-  };
+  return { correctLogin, token, cookieOption };
 };
+
 
 module.exports = login;

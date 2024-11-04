@@ -4,32 +4,17 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/actions/actions";
 import validationLogin from "./validationLogin";
-import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase";
 import { signInWithPopup } from "firebase/auth";
 
 export const FormLogin = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
   const isAuth = useSelector((state) => state.auth.isAuth);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-    validationLogin({ ...formData, [name]: value }, errors, setErrors);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,39 +23,36 @@ export const FormLogin = () => {
 
     if (noErrors) {
       try {
-        await signInWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-        );
-        dispatch(login(formData));
-
-        /*setTimeout(() => {
-          window.location.reload();
-        }, 2000);*/
+        await signInWithEmailAndPassword(email, password);
       } catch (error) {
         console.log(error.message);
       }
     }
   };
 
-  const handleLoginWithGoogle = async () => {
+  const handleLoginWithGoogle = async (e) => {
+    e.preventDefault();
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log("Usuario de google", user);
+      dispatch(
+        login({
+          email: result.user.email,
+          displayName: result.user.displayName,
+        })
+      );
     } catch (error) {
       console.log(error);
     }
-    dispatch(login(formData));
   };
 
   useEffect(() => {
     if (isAuth) {
       navigate("/dashboard");
     }
-  }, [isAuth, navigate]);
+  }, [isAuth]);
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-4">
@@ -78,12 +60,12 @@ export const FormLogin = () => {
           Email
         </label>
         <input
-          type="text"
+          type="email"
           id="email"
           name="email"
-          value={formData.email}
+          value={email}
           className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-          onChange={handleChange}
+          onChange={(e)=>setEmail(e.target.value)}
         />
         {errors.email && (
           <p className="text-red-500 text-xs italic">{errors.email}</p>
@@ -97,9 +79,9 @@ export const FormLogin = () => {
           type="password"
           id="password"
           name="password"
-          value={formData.password}
+          value={password}
           className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-          onChange={handleChange}
+          onChange={(e)=>setPassword(e.target.value)}
         />
         {errors.password && (
           <p className="text-red-500 text-xs italic">{errors.password}</p>
@@ -127,7 +109,12 @@ export const FormLogin = () => {
       >
         Login
       </button>
-      <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"onClick={handleLoginWithGoogle}>Iniciar sesión con Google</button>
+      <button
+        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
+        onClick={handleLoginWithGoogle}
+      >
+        Iniciar sesión con Google
+      </button>
     </form>
   );
 };
