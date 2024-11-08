@@ -1,4 +1,5 @@
 import CryptoJS from "crypto-js";
+import toast from "react-hot-toast";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -14,6 +15,9 @@ import {
   loginWithGoogle,
   authenticateUserFromSession
 } from "../redux/actions/actions";
+
+
+
 
 
 export const doSignInWithGoogle = async () => {
@@ -33,14 +37,13 @@ export const doSignInWithGoogle = async () => {
     if (response.ok) {
      console.log( "Ingreso exitoso, redirigiendo..");
       const { theUser } = await response.json();
-      const { uid, email, displayName, photoURL } = result.user;
+      const { id, email, displayName, photoURL } = result.user;
 
       const userInfo = {
-        uid,
+        id,
         email,
         name: displayName,
         picture: photoURL,
-        rol: theUser.rol, // Agregamos el rol al userInfo
       };
 
       const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
@@ -54,14 +57,6 @@ export const doSignInWithGoogle = async () => {
       localStorage.setItem("authToken", token);
 
       store.dispatch(loginWithGoogle(userInfo));
-
-      setTimeout(() => {
-        if (theUser.rol === "vendedor" || theUser.rol === "admin") {
-          window.location.replace("/dashboard/dashboard");
-        } else {
-          window.location.replace("/");
-        }
-      }, 2000);
     } else {
       toast.error("Error al ingresar");
       throw new Error("Error al enviar el token al backend");
@@ -81,18 +76,29 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
     );
     const user = userCredential.user;
     const token = await user.getIdToken();
-
+    console.log("Email:", email);
+console.log("Password:", password);
+console.log("Token:", token);
     const response = await fetch(`${rutaBack}/login/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        
+         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({ token: token }),
+      body: JSON.stringify({ email: user.email })
     });
-
+    console.log("Respuesta del servidor:", response);
     if (response.ok) {
       toast.success("Ingreso exitoso, redirigiendo..");
+      const userInfo = { 
+        uid: user.uid, // Obtener el uid del usuario de Firebase
+        email: user.email, // Obtener el email del usuario de Firebase
+        // ... otras propiedades que necesites ...
+      };
       const sellerData = await response.json();
+      console.log(sellerData);
+      
       const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
 
       const hashedUserInfo = CryptoJS.AES.encrypt(
@@ -106,14 +112,11 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
       store.dispatch(loginWithGoogle(userInfo));
 
       setTimeout(() => {
-        if ( sellerData.rol === "admin") {
-          window.location.replace("/dashboard/dashboard");
-        } else {
-          window.location.replace("/");
-        }
+          window.location.replace("/user");
       }, 2000);
     } else {
       toast.error("Error al ingresar");
+      console.error("Error en la respuesta:", response.status, response.statusText);
       throw new Error("Error al enviar el token al backend");
     }
   } catch (error) {

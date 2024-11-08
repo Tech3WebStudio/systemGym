@@ -1,6 +1,6 @@
 import { GoogleAuthProvider, signInWithEmailAndPassword, getAuth, signInWithPopup, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { doSignInWithEmailAndPassword } from "../../firebase/auth";
+import { doSignInWithEmailAndPassword, doSignInWithGoogle } from "../../firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { authenticateUserFromSession,   
  login } from "../../redux/actions/actions";
@@ -16,8 +16,7 @@ export const FormLogin = () => {
         email: "",
         password: "",
     });
-    const auth   
- = getAuth();
+    const auth = getAuth();
     const dispatch = useDispatch();
     const isAuth = useSelector((state) => state.auth.isAuth);
     const navigate = useNavigate();
@@ -35,36 +34,11 @@ export const FormLogin = () => {
       }
     };
 
-    const handleLoginWithGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const   
- token = await result.user.getIdToken();   
+    const handleLoginWithGoogle = async (e) => {
+      e.preventDefault();
+      dispatch(doSignInWithGoogle());
+    }
 
-            console.log("Token ID de Google:", token);
-
-            const response = await fetch("http://localhost:3001/login/third", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token }),
-            });
-
-            const data = await response.json();
-            console.log("Respuesta del backend (Google):", data);
-            if (response.ok) {
-                dispatch({ type: "LOGIN_SUCCESS", payload: data });
-            } else {
-                console.error("Error al iniciar sesión con Google:", data.error);
-                dispatch({ type: "LOGIN_ERROR", payload: data.error });
-            }
-        } catch (error) {
-            console.log("Error al iniciar sesión con Google:", error.message);
-            dispatch({ type: "LOGIN_ERROR", payload: error.message });
-        }
-    };
 
     useEffect(() => {
         if (isAuth) {

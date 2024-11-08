@@ -8,8 +8,10 @@ const { sign } = require("jsonwebtoken");
 
 loginRoutes.post("/", async (req, res) => {
   try {
+    console.log("Cuerpo de la solicitud:", req.body);
     const { email, password } = req.body;
-    const { correctLogin, token, cookieOption } = await login(email, password);
+    const { correctLogin, token, cookieOption } = await login(email, password); 
+    console.log("Token recibido:", token); // Mueve esta línea aquí
     return res
       .status(200)
       .json({ message: "Correct login", token, correctLogin });
@@ -21,7 +23,6 @@ loginRoutes.post("/", async (req, res) => {
 loginRoutes.post('/third', async (req, res) => {
   try {
     const { token } = req.body;  
-    console.log(token);
     // Asegúrate de que el token esté presente en el cuerpo
 
     if (!token) {
@@ -29,7 +30,6 @@ loginRoutes.post('/third', async (req, res) => {
     }
 
     const decodedToken = await verifyToken(token); 
-    console.log(decodedToken);
      // Verifica el ID token con Firebase
 
     // Si el token es válido, procede con el inicio de sesión
@@ -37,7 +37,6 @@ loginRoutes.post('/third', async (req, res) => {
 
 
     const theUser = await User.findOne({ where: { email } });
-    console.log(theUser);
     
     if(theUser){
       await theUser.update({
