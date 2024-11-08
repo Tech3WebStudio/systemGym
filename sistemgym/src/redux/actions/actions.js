@@ -17,6 +17,7 @@ export const NEW_MEMBER = "NEW_MEMBER";
 export const ALL_MEMBERS = "ALL_MEMBERS";
 export const DELETED_MEMBER = "DELETED_MEMBER";
 export const CREATED_USER ="CREATED_USER"
+export const LOGIN_ERROR = 'LOGIN_ERROR';
 
 
 export const createUser = (data) => async (dispatch) => {
@@ -34,6 +35,32 @@ export const createUser = (data) => async (dispatch) => {
     toast.error("Error al crear usuario");
   }
 };
+export const authenticateUserFromSession = () => {
+  return (dispatch) => {
+    const hashedUserInfo = sessionStorage.getItem("user");
+
+    if (hashedUserInfo) {
+      try {
+        const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
+        const bytes = CryptoJS.AES.decrypt(hashedUserInfo, secretKey);
+        const userInfo = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        console.log("Información encriptada:", hashedUserInfo);
+        console.log("Bytes desencriptados:", bytes);
+        console.log("Información del usuario:", userInfo);
+        dispatch({
+          type: AUTHENTICATE_USER_FROM_SESSION,
+          payload: userInfo,
+        });
+      } catch (error) {
+        console.error(
+          "Error desencriptando la información del usuario:",
+          error
+        );
+        toast.error("Error autenticando usuario");
+      }
+    }
+  };
+};
 
 export const login = (formData) => async (dispatch) => {
   const endpoint = `${rutaBack}/login/`;
@@ -42,12 +69,13 @@ export const login = (formData) => async (dispatch) => {
       withCredentials: true,
     });
     if (response.data.correctLogin) {
+      const token = response.data.token;
       dispatch({ type: LOGIN_SUCCESS, payload: response.data.user });
     }
   } catch (error) {
     console.log(error);
-    localStorage.setItem("isAuth", "false");
-  }
+    dispatch({type:"LOGIN_ERROR"})
+    }
 };
 
 export const logout = () => async (dispatch) => {
@@ -235,27 +263,5 @@ export const deleteMember = (id) => async(dispatch) => {
     })
   }
 }
-export const authenticateUserFromSession = () => {
-  return (dispatch) => {
-    const hashedUserInfo = sessionStorage.getItem("user");
 
-    if (hashedUserInfo) {
-      try {
-        const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
-        const bytes = CryptoJS.AES.decrypt(hashedUserInfo, secretKey);
-        const userInfo = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        dispatch({
-          type: AUTHENTICATE_USER_FROM_SESSION,
-          payload: userInfo,
-        });
-      } catch (error) {
-        console.error(
-          "Error desencriptando la información del usuario:",
-          error
-        );
-        toast.error("Error autenticando usuario");
-      }
-    }
-  };
-};
 

@@ -1,87 +1,101 @@
-import { GoogleAuthProvider } from "firebase/auth";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, getAuth, signInWithPopup, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
+import { doSignInWithEmailAndPassword } from "../../firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../redux/actions/actions";
+import { authenticateUserFromSession,   
+ login } from "../../redux/actions/actions";
 import validationLogin from "./validationLogin";
-import { signInWithPopup } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+
 
 export const FormLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [errors, setErrors] = useState({   
 
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-  });
-  const isAuth = useSelector((state) => state.auth.isAuth);
+        email: "",
+        password: "",
+    });
+    const auth   
+ = getAuth();
+    const dispatch = useDispatch();
+    const isAuth = useSelector((state) => state.auth.isAuth);
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    validationLogin(formData, errors, setErrors);
-    const noErrors = Object.keys(errors).every((key) => errors[key] === "");
+    useEffect(() => {
+        dispatch(authenticateUserFromSession());
+    }, [dispatch]);
 
-    if (noErrors) {
+    const handleSubmit = async (event) => {
+      event.preventDefault();
       try {
-        await signInWithEmailAndPassword(email, password);
+        await doSignInWithEmailAndPassword(email, password);
       } catch (error) {
-        console.log(error.message);
+        console.error("Error al ingresar:", error);
       }
-    }
-  };
+    };
 
-  const handleLoginWithGoogle = async (e) => {
-    e.preventDefault();
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      console.log("Usuario de google", user);
-      dispatch(
-        login({
-          email: result.user.email,
-          displayName: result.user.displayName,
-        })
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    const handleLoginWithGoogle = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const   
+ token = await result.user.getIdToken();   
 
-  useEffect(() => {
-    if (isAuth) {
-      navigate("/dashboard");
-    }
-  }, [isAuth]);
+            console.log("Token ID de Google:", token);
+
+            const response = await fetch("http://localhost:3001/login/third", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ token }),
+            });
+
+            const data = await response.json();
+            console.log("Respuesta del backend (Google):", data);
+            if (response.ok) {
+                dispatch({ type: "LOGIN_SUCCESS", payload: data });
+            } else {
+                console.error("Error al iniciar sesión con Google:", data.error);
+                dispatch({ type: "LOGIN_ERROR", payload: data.error });
+            }
+        } catch (error) {
+            console.log("Error al iniciar sesión con Google:", error.message);
+            dispatch({ type: "LOGIN_ERROR", payload: error.message });
+        }
+    };
+
+    useEffect(() => {
+        if (isAuth) {
+            navigate("/dashboard");
+        }
+    }, [isAuth, navigate]);
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-4">
-        <label htmlFor="email" className="block text-gray-600">
-          Email
-        </label>
+        <label htmlFor="email" className="block text-gray-600">Email</label>
         <input
           type="email"
           id="email"
           name="email"
           value={email}
           className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-          onChange={(e)=>setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
         {errors.email && (
           <p className="text-red-500 text-xs italic">{errors.email}</p>
         )}
       </div>
       <div className="mb-4">
-        <label htmlFor="password" className="block text-gray-600">
-          Password
-        </label>
+        <label htmlFor="password" className="block text-gray-600">Password</label>
         <input
           type="password"
           id="password"
           name="password"
           value={password}
           className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-          onChange={(e)=>setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
         />
         {errors.password && (
           <p className="text-red-500 text-xs italic">{errors.password}</p>
@@ -94,14 +108,10 @@ export const FormLogin = () => {
           name="remember"
           className="text-blue-500"
         />
-        <label htmlFor="remember" className="text-gray-600 ml-2">
-          Remember Me
-        </label>
+        <label htmlFor="remember" className="text-gray-600 ml-2">Remember Me</label>
       </div>
       <div className="mb-6 text-blue-500">
-        <a href="#" className="hover:underline">
-          Forgot Password?
-        </a>
+        <a href="#" className="hover:underline">Forgot Password?</a>
       </div>
       <button
         type="submit"
@@ -110,7 +120,8 @@ export const FormLogin = () => {
         Login
       </button>
       <button
-        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
+        type="button"
+        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full mt-2"
         onClick={handleLoginWithGoogle}
       >
         Iniciar sesión con Google

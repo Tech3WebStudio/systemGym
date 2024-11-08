@@ -1,6 +1,6 @@
 const { User } = require("../../db.js");
 const bcryptjs = require("bcryptjs");
-const jsonwebtoken = require("jsonwebtoken");
+const admin = require("firebase-admin");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -19,18 +19,23 @@ const login = async (email, password) => {
   }
 
   const theUser = await User.findOne({ where: { email } });
+  console.log(theUser, "este seria el usuario al iniciar con password y email");
+  
   if (!theUser) {
     console.error("Email incorrecto:", email);
     throw new Error("Wrong email");
   }
 
   const correctLogin = await bcryptjs.compare(password, theUser.password);
+  console.log("Contraseña correcta:", correctLogin);
+
   if (!correctLogin) {
     console.error("Contraseña incorrecta para el usuario:", email);
     throw new Error("Incorrect password");
   }
 
-  const token = jsonwebtoken.sign({ user: theUser.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  const token = await admin.auth().createCustomToken(theUser.id.toString());
+  console.log("Token generado:", token);
   const cookieOption = {
     maxAge: 24 * 60 * 60 * 1000,
     path: "/",

@@ -1,27 +1,19 @@
-const validationLogin = ({ email, password }, errors, setErrors) => {
-  let newErrors = { ...errors };
+const validationLogin = (email, password) => {
+  const errors = {};
 
-  // Validación de email (común para todas las vistas)
   if (!email) {
-    newErrors.email = "El correo electrónico está vacío";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    newErrors.email = "El correo electrónico no es válido";
-  } else {
-    newErrors.email = "";
+    errors.email = "El email es obligatorio";
+  } else if (!/\S+@\S+\.\S+/.test(email)) {
+    errors.email = "El email no es válido";
   }
+
   if (!password) {
-    newErrors.password = "El password está vacío";
+    errors.password = "La contraseña es obligatoria";
   } else if (password.length < 6) {
-    newErrors.password = "El password debe tener al menos 6 caracteres";
-  } else if (
-    !/(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])/.test(password)
-  ) {
-    newErrors.password =
-      "El password debe contener al menos un número, una letra mayúscula, una letra minúscula y un símbolo especial";
-  } else {
-    newErrors.password = "";
+    errors.password = "La contraseña debe tener al menos 6 caracteres";
   }
-  setErrors(newErrors);
+
+  return errors;
 };
 
 export default validationLogin;

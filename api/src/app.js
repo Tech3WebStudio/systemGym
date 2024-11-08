@@ -18,6 +18,11 @@ server.use(
       credentials: true,
     })
   );
+server.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    next();
+  });
 server.use(router);
 server.use(invalidRoute);
 server.use((err, req, res, next) => {

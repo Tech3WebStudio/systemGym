@@ -1,38 +1,41 @@
-const admin = require("./firebaseAdmin");
-const { user } = require('../../db.js');
+const admin = require("firebase-admin");
+const { User } = require('../../db.js');
+
 
 const authThird = async (token) => {
     try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-        const { uid, email, email_verified, firebase, name, picture } = decodedToken;
-
-        const userExist = await user.findOne({
-            where: {email}
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      const { uid, email, email_verified, firebase, name, picture } = decodedToken;
+  
+      const userExist = await User.findOne({
+        where: { email }
+      });
+  
+      if(userExist) throw new Error("The user already exists");
+  
+      const [theUser, created] = await User.findOrCreate({
+        where: { email },
+        defaults: {
+          id_user: uid,
+          name: name || " ",
+          email_verified,
+          sign_in_provider: firebase.sign_in_provider,
+          picture: picture || " ",
+        },
+      });
+  
+      if (!created) {
+        await theUser.update({
+          email_verified,
         });
-        
-        if(userExist) throw new Error("The user already exist");
-    
-        const [theUser, created] = await user.findOrCreate({
-            where: { email },
-            defaults: {
-              id_user: uid,
-              name: name || " ",
-              email_verified,
-              sign_in_provider: firebase.sign_in_provider,
-              picture: picture || " ",
-            },
-          });
-        if(!created){
-            await theUser.update({
-                email_verified,
-                //demas campos a actualizar
-            });
-        };
-        
-        return theUser;
+      }
+  
+      return theUser;
     } catch (error) {
-        throw new Error(error.message);
+      console.error("Error en el inicio de sesión con Google:", error);
+      throw new Error(error.message);  // Proporciona el error detallado
     }
-};
+  };
+  
 
 module.exports = authThird;

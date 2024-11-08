@@ -28,8 +28,8 @@ async function authenticateToken(req, res, next) {
 
     next();
   } catch (error) {
-    console.log(error);
-    res.status(401).send("Unauthorized");
+    console.log("Error al verificar el token:", error);
+        res.status(401).send("Unauthorized");
   }
 }
 

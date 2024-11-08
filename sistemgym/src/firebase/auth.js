@@ -22,7 +22,7 @@ export const doSignInWithGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
     const token = await result.user.getIdToken();
 
-    const response = await fetch(`${rutaBack}/api/login/third`, {
+    const response = await fetch(`${rutaBack}/login/third`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
     const user = userCredential.user;
     const token = await user.getIdToken();
 
-    const response = await fetch(`${rutaBack}/api/login/email`, {
+    const response = await fetch(`${rutaBack}/login/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,29 +93,9 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
     if (response.ok) {
       toast.success("Ingreso exitoso, redirigiendo..");
       const sellerData = await response.json();
-      let userInfo;
-      if (sellerData.rol === "user") {
-        userInfo = {
-          uid: sellerData.uid,
-          email: sellerData.email,
-          name: sellerData.nombre,
-          direccion: sellerData.direccion,
-          provincia: sellerData.provincia,
-          cp: sellerData.cp,
-          rol: sellerData.rol,
-        };
-      } else {
-        userInfo = {
-          uid: sellerData.uid,
-          email: sellerData.email,
-          name: sellerData.nombre,
-          rol: sellerData.rol,
-        };
-      }
-
       const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
 
-      const hashedUserInfo = cryptoJS.AES.encrypt(
+      const hashedUserInfo = CryptoJS.AES.encrypt(
         JSON.stringify(userInfo),
         secretKey
       ).toString();
@@ -126,7 +106,7 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
       store.dispatch(loginWithGoogle(userInfo));
 
       setTimeout(() => {
-        if (sellerData.rol === "vendedor" || sellerData.rol === "admin") {
+        if ( sellerData.rol === "admin") {
           window.location.replace("/dashboard/dashboard");
         } else {
           window.location.replace("/");

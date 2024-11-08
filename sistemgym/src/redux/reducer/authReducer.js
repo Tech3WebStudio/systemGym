@@ -17,9 +17,15 @@ const initialState = {
   registerError: null,
   loginError: null,
   mailExist: false,
+  error:null
 };
-
+function logError(message) {  // Define la función logError
+  if (import.meta.env.DEV) {
+    console.error(message);
+  }
+}
 const authReducer = (state = initialState, action) => {
+  console.log("Acción recibida:", action);
   const { type, payload } = action;
   switch (type) {
     case REGISTER_SUCCESS:
@@ -39,13 +45,20 @@ const authReducer = (state = initialState, action) => {
     case UPDATE_USER:
 
     case AUTHENTICATE_USER_FROM_SESSION:
+      console.log("Payload:", action.payload);
       return { ...state, user: payload, isAuth: true };
     case RESET_PASS:
       return { ...state, mailExist: payload };
 
     case CREATED_USER:
       return { ...state, user: payload, isAuth: true };
-    default:
+      case "LOGIN_ERROR":
+       logError("Error al iniciar sesión");
+        return {
+          ...state,
+          isAuth: false,
+          user: null,
+        };    default:
       return state;
   }
 };

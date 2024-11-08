@@ -1,6 +1,8 @@
 import { useDispatch } from "react-redux";
 import validationRegister from "./validationRegister";
 import {createNewUser} from '../../firebase/auth'
+import {useState} from 'react'
+import { getAuth } from "firebase/auth";
 
 export const FormRegister = () => {
   const [name, setName] = useState("");
