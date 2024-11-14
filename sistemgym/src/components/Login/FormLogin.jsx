@@ -28,7 +28,6 @@ export const FormLogin = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      console.log(email, password);
       await doSignInWithEmailAndPassword(email, password);
     } catch (error) {
       console.error("Error al ingresar:", error);

@@ -5,7 +5,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const login = async (email) => {
-  console.log("Intentando iniciar sesión con:", { email });
 
   if (!email) {
     throw new Error("Incomplete data");

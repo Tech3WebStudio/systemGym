@@ -58,8 +58,9 @@ async function verifyToken(token) {
 async function isAdmin(email) {
   const adminEmails = [
     "niveyrojulian5@gmail.com",
-    "sebastiannahuelmieres@gmail.com",
-    "matiascarballo433@gmail.com",
+    "claudioarganaraz86@gmail.com",
+    "acheenvios@gmail.com",
+    "matiassjv@gmail.com",
   ];
   return adminEmails.includes(email);
 }

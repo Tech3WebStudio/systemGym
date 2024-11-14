@@ -3,9 +3,8 @@ const { User } = require("../../db.js");
 
 const authThird = async (token) => {
   try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    const { uid, email, email_verified, firebase, name, picture } =
-      decodedToken;
+    const decodedToken = await admin.auth().verifyIdTokentoken();
+    const { uid, email, email_verified, name, picture } = decodedToken;
 
     const userExist = await User.findOne({
       where: { email },
@@ -18,6 +17,7 @@ const authThird = async (token) => {
       defaults: {
         name: name || " ",
         isActive: email_verified,
+        token: uid,
         picture: picture || " ",
       },
     });
