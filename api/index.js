@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Client } = require('pg');
+const { Client } = require("pg");
 const port = process.env.PORT || 3001;
 const server = require("./src/app.js");
 const { conn } = require("./src/db.js");
@@ -14,7 +14,9 @@ async function createDatabase() {
 
   try {
     await client.connect();
-    const res = await client.query(`SELECT 1 FROM pg_database WHERE datname='${process.env.DB_NAME}'`);
+    const res = await client.query(
+      `SELECT 1 FROM pg_database WHERE datname='${process.env.DB_NAME}'`
+    );
     if (res.rowCount === 0) {
       await client.query(`CREATE DATABASE ${process.env.DB_NAME}`);
       console.log(`Database ${process.env.DB_NAME} created successfully!`);
@@ -22,32 +24,30 @@ async function createDatabase() {
       console.log(`Database ${process.env.DB_NAME} already exists.`);
     }
   } catch (err) {
-    console.error('Error creating database:', err);
+    console.error("Error creating database:", err);
   } finally {
     await client.end();
   }
 }
 
-
-conn.authenticate()
+conn
+  .authenticate()
   .then(() => {
-    console.log('Conexión a la base de datos establecida correctamente.');
+    console.log("Conexión a la base de datos establecida correctamente.");
   })
-  .catch(err => {
-    console.error('No se pudo conectar a la base de datos:', err);
+  .catch((err) => {
+    console.error("No se pudo conectar a la base de datos:", err);
   });
 
-conn.sync({ force: false }).then(() => {
-  console.log('Base de datos sincronizada');
-  // Aquí puedes iniciar tu servidor o cualquier otra lógica que necesites después de sincronizar la DB.
+conn
+  .sync({ force: true })
+  .then(() => {
+    console.log("Base de datos sincronizada");
 
-  server.listen(port, () => {
-    console.log(`Servidor escuchando en el puerto ${port}`);
+    server.listen(port, () => {
+      console.log(`Servidor escuchando en el puerto ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Error al sincronizar la base de datos:", err.message);
   });
-  
-}).catch(err => {
-  console.error('Error al sincronizar la base de datos:', err);
-})
-
-
-

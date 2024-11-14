@@ -17,9 +17,10 @@ const initialState = {
   registerError: null,
   loginError: null,
   mailExist: false,
-  error:null
+  error: null,
 };
-function logError(message) {  // Define la función logError
+function logError(message) {
+  // Define la función logError
   if (import.meta.env.DEV) {
     console.error(message);
   }
@@ -45,20 +46,20 @@ const authReducer = (state = initialState, action) => {
     case UPDATE_USER:
 
     case AUTHENTICATE_USER_FROM_SESSION:
-      console.log("Payload:", action.payload);
-      return { ...state, user: payload, isAuth: true };
+      return { ...state, isAuth: payload };
     case RESET_PASS:
       return { ...state, mailExist: payload };
 
     case CREATED_USER:
       return { ...state, user: payload, isAuth: true };
-      case "LOGIN_ERROR":
-       logError("Error al iniciar sesión");
-        return {
-          ...state,
-          isAuth: false,
-          user: null,
-        };    default:
+    case "LOGIN_ERROR":
+      logError("Error al iniciar sesión");
+      return {
+        ...state,
+        isAuth: false,
+        user: null,
+      };
+    default:
       return state;
   }
 };

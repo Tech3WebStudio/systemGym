@@ -6,15 +6,18 @@ module.exports = (sequelize) => {
     name: { type: DataTypes.STRING, allowNull: false },
     lastname: { type: DataTypes.STRING, allowNull: true },
     dni: { type: DataTypes.STRING, allowNull: true },
-    email: { type: DataTypes.STRING, allowNull: false, unique: true },
-    password: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: true, unique: true },
+    password: { type: DataTypes.STRING, allowNull: true },
     phone: { type: DataTypes.STRING, allowNull: true },
     isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
+    picture: { type: DataTypes.STRING, allowNull: true },
     role: {
       type: DataTypes.ENUM("user", "admin", "staff"),
       defaultValue: "user",
       allowNull: true,
-    },hasPaid: { // Nuevo campo para controlar el pago de los usuarios
+    },
+    hasPaid: {
+      // Nuevo campo para controlar el pago de los usuarios
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
@@ -23,20 +26,19 @@ module.exports = (sequelize) => {
     specialGroupId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'SpecialGroups', // Referencia al modelo de grupos
-        key: 'id'
-      },
-      allowNull: true
-    },
-    planId: {  // Añadir este campo
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Plan', // Asegúrate de que el nombre del modelo esté en singular o plural según tu configuración
-        key: 'id'
+        model: "SpecialGroups",
+        key: "id",
       },
       allowNull: true,
-      onUpdate: 'CASCADE',
-      onDelete: 'SET NULL',
+    },
+    planId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "Plan",
+        key: "id",
+      },
+      allowNull: true,
+      onDelete: "SET NULL",
     },
   });
 
