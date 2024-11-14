@@ -38,12 +38,6 @@ export const FormLogin = () => {
     e.preventDefault();
     dispatch(doSignInWithGoogle());
   };
-
-  useEffect(() => {
-    if (isAuth) {
-      navigate("/dashboard");
-    }
-  }, [isAuth, navigate]);
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-4">

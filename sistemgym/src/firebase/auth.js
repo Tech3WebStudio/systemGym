@@ -55,6 +55,14 @@ export const doSignInWithGoogle = async () => {
       localStorage.setItem("authToken", token);
 
       store.dispatch(loginWithGoogle(userInfo));
+
+      setTimeout(() => {
+        if (userInfo.rol === "seller" || userInfo.rol === "admin") {
+          window.location.replace(`/dashboard`);
+        } else {
+          window.location.replace("/");
+        }
+      }, 2000);
     } else {
       toast.error("Error al ingresar");
       throw new Error("Error al enviar el token al backend");
@@ -121,7 +129,7 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
 
       setTimeout(() => {
         if (sellerData.rol === "seller" || sellerData.rol === "admin") {
-          window.location.replace(`/dashboard/${sellerData.uid}`);
+          window.location.replace(`/dashboard`);
         } else {
           window.location.replace("/");
         }
