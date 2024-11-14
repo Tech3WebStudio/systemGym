@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
+import { doSignOut } from "../../firebase/auth";
 
 export const Nav = () => {
+  const logout = async () => {
+    await doSignOut().then(() => {
+      sessionStorage.removeItem("user");
+      localStorage.removeItem("authToken");
+    });
+  };
   return (
     <div className="space-y-6 md:space-y-10 mt-10">
       <h1 className="font-bold text-4xl text-center md:hidden">
@@ -129,7 +136,9 @@ export const Nav = () => {
           </svg>
           <span className="">Configuraciones</span>
         </Link>
-        <button className="text-sm font-medium text-gray-700 py-2 px-2 hover:bg-teal-500 hover:text-white rounded-md transition duration-150 ease-in-out"
+        <button
+          onClick={() => logout()}
+          className="text-sm font-medium text-gray-700 py-2 px-2 hover:bg-teal-500 hover:text-white rounded-md transition duration-150 ease-in-out"
         >
           Salir
         </button>

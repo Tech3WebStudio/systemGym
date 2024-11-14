@@ -14,7 +14,6 @@ const serviceAccount = {
   client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
 };
 
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -32,6 +31,7 @@ async function authenticateToken(req, res, next) {
     const allowedUsers = [
       "niveyrojulian5@gmail.com",
       "claudioarganaraz86@gmail.com",
+      "acheenvios@gmail.com",
       "matiassjv@gmail.com",
     ];
     if (!allowedUsers.includes(decodedToken.email)) {

@@ -1,3 +1,4 @@
+import CryptoJS from "crypto-js";
 import axios from "axios";
 import { deleteSessionToken } from "../../components/delCookie";
 import Swal from "sweetalert2";
@@ -21,9 +22,9 @@ export const CREATED_USER = "CREATED_USER";
 export const LOGIN_ERROR = "LOGIN_ERROR";
 
 export const createUser = (data) => async (dispatch) => {
-  console.log(data);
   try {
-    const response = await axios.post(`${rutaBack}/user/create`, data);
+    const response = await axios.post(`${rutaBack}/user/`, data);
+    console.log(response);
     if (response.ok) {
       dispatch({
         type: CREATED_USER,
@@ -37,24 +38,35 @@ export const createUser = (data) => async (dispatch) => {
 };
 export const authenticateUserFromSession = () => {
   return (dispatch) => {
-    try {
-      dispatch({
-        type: AUTHENTICATE_USER_FROM_SESSION,
-        payload: false,
-      });
-    } catch (error) {
-      console.error("Error desencriptando la información del usuario:", error);
-      toast.error("Error autenticando usuario");
+    const hashedUserInfo = sessionStorage.getItem("user");
+
+    if (hashedUserInfo) {
+      try {
+        const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
+        const bytes = CryptoJS.AES.decrypt(hashedUserInfo, secretKey);
+        const userInfo = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+        dispatch({
+          type: AUTHENTICATE_USER_FROM_SESSION,
+          payload: userInfo,
+        });
+      } catch (error) {
+        console.error(
+          "Error desencriptando la información del usuario:",
+          error
+        );
+        toast.error("Error autenticando usuario");
+      }
     }
   };
 };
 
 export const login = (formData) => async (dispatch) => {
-  const endpoint = `${rutaBack}/login/`;
   try {
-    const response = await axios.post(endpoint, formData, {
+    const response = await axios.post(`${rutaBack}/login/`, formData, {
       withCredentials: true,
     });
+    console.log(response);
     if (response.data.correctLogin) {
       const token = response.data.token;
       console.log(token);

@@ -1,54 +1,56 @@
-import { GoogleAuthProvider, signInWithEmailAndPassword, getAuth, signInWithPopup, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { doSignInWithEmailAndPassword, doSignInWithGoogle } from "../../firebase/auth";
+import {
+  doSignInWithEmailAndPassword,
+  doSignInWithGoogle,
+} from "../../firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { authenticateUserFromSession,   
- login } from "../../redux/actions/actions";
-import validationLogin from "./validationLogin";
+import {
+  authenticateUserFromSession,
+  login,
+} from "../../redux/actions/actions";
 import { useNavigate } from "react-router-dom";
 
-
 export const FormLogin = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [errors, setErrors] = useState({   
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+  const dispatch = useDispatch();
+  const isAuth = useSelector((state) => state.auth.isAuth);
+  const navigate = useNavigate();
 
-        email: "",
-        password: "",
-    });
-    const auth = getAuth();
-    const dispatch = useDispatch();
-    const isAuth = useSelector((state) => state.auth.isAuth);
-    const navigate = useNavigate();
+  useEffect(() => {
+    dispatch(authenticateUserFromSession());
+  }, [dispatch]);
 
-    useEffect(() => {
-        dispatch(authenticateUserFromSession());
-    }, [dispatch]);
-
-    const handleSubmit = async (event) => {
-      event.preventDefault();
-      try {
-        await doSignInWithEmailAndPassword(email, password);
-      } catch (error) {
-        console.error("Error al ingresar:", error);
-      }
-    };
-
-    const handleLoginWithGoogle = async (e) => {
-      e.preventDefault();
-      dispatch(doSignInWithGoogle());
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      console.log(email, password);
+      await doSignInWithEmailAndPassword(email, password);
+    } catch (error) {
+      console.error("Error al ingresar:", error);
     }
+  };
 
+  const handleLoginWithGoogle = async (e) => {
+    e.preventDefault();
+    dispatch(doSignInWithGoogle());
+  };
 
-    useEffect(() => {
-        if (isAuth) {
-            navigate("/dashboard");
-        }
-    }, [isAuth, navigate]);
+  useEffect(() => {
+    if (isAuth) {
+      navigate("/dashboard");
+    }
+  }, [isAuth, navigate]);
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-4">
-        <label htmlFor="email" className="block text-gray-600">Email</label>
+        <label htmlFor="email" className="block text-gray-600">
+          Email
+        </label>
         <input
           type="email"
           id="email"
@@ -62,7 +64,9 @@ export const FormLogin = () => {
         )}
       </div>
       <div className="mb-4">
-        <label htmlFor="password" className="block text-gray-600">Password</label>
+        <label htmlFor="password" className="block text-gray-600">
+          Password
+        </label>
         <input
           type="password"
           id="password"
@@ -82,13 +86,17 @@ export const FormLogin = () => {
           name="remember"
           className="text-blue-500"
         />
-        <label htmlFor="remember" className="text-gray-600 ml-2">Remember Me</label>
+        <label htmlFor="remember" className="text-gray-600 ml-2">
+          Remember Me
+        </label>
       </div>
       <div className="mb-6 text-blue-500">
-        <a href="#" className="hover:underline">Forgot Password?</a>
+        <a href="#" className="hover:underline">
+          Forgot Password?
+        </a>
       </div>
       <button
-        type="submit"
+        onClick={() => handleSubmit}
         className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
       >
         Login

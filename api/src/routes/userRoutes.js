@@ -13,14 +13,11 @@ const deleteMember = require("../controllers/userControllers/deleteMember");
 
 userRoutes.post("/", async (req, res) => {
   try {
-    const { name, password, email } = req.body;
-    const newUser = await postUser({
-      name,
-      email,
-      password,
-    });
+    const data = req.body;
+    const newUser = await postUser(data);
     return res.status(200).json(newUser);
   } catch (error) {
+    console.log(error.message);
     return res.status(500).json({ error: error.message });
   }
 });

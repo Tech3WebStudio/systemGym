@@ -5,14 +5,16 @@ const { verifyToken, isAdmin } = require("../middleware/authorization");
 const authThird = require("../controllers/loginControllers/thirdPartyAuth");
 loginRoutes.post("/", async (req, res) => {
   try {
-    console.log("Cuerpo de la solicitud:", req.body);
-    const { email, password } = req.body;
-    const { correctLogin, token, cookieOption } = await login(email, password);
-    console.log("Token recibido:", token); // Mueve esta línea aquí
+    const { token } = req.body;
+    const decodedToken = await verifyToken(token);
+    const email = decodedToken.email;
+
+    const { clave, cookieOption } = await login(email);
     return res
       .status(200)
-      .json({ message: "Correct login", token, correctLogin });
+      .json({ message: "Correct login", clave, cookieOption });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 });

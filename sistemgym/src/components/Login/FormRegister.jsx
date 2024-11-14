@@ -1,31 +1,33 @@
-import { useDispatch } from "react-redux";
-import validationRegister from "./validationRegister";
-import {createNewUser} from '../../firebase/auth'
-import {useState} from 'react'
-import { getAuth } from "firebase/auth";
+// import validationRegister from "./validationRegister";
+import { useNavigate } from "react-router-dom";
+import { createNewUser } from "../../firebase/auth";
+import { useState } from "react";
 
 export const FormRegister = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const auth = getAuth();
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const data = {
         name: name,
         email: email,
         password: password,
       };
-      await createNewUser(data, auth, dispatch);
+      await createNewUser(data);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleLogin = () => {
+    navigate("/");
   };
 
   return (
@@ -47,7 +49,7 @@ export const FormRegister = () => {
           id="name"
           placeholder="name"
           value={name}
-          onChange={(e)=>setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
         />
         {errors.name && (
           <p className="text-red-500 text-xs italic">{errors.name}</p>
@@ -67,7 +69,7 @@ export const FormRegister = () => {
           id="email"
           value={email}
           placeholder="@email"
-          onChange={(e)=>setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
         {errors.email && (
           <p className="text-red-500 text-xs italic">{errors.email}</p>
@@ -87,21 +89,21 @@ export const FormRegister = () => {
           value={password}
           id="password"
           placeholder="password"
-          onChange={(e)=>setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
         />
         {errors.password && (
           <p className="text-red-500 text-xs italic">{errors.password}</p>
         )}
       </div>
-     
+
       <button
-        type="submit"
+        onClick={() => handleSubmit}
         className="w-full mt-6 bg-indigo-600 rounded-lg px-4 py-2 text-lg text-white tracking-wide font-semibold font-sans"
       >
         Register
       </button>
       <button
-        type="submit"
+        onClick={() => handleLogin()}
         className="w-full mt-6 mb-3 bg-indigo-100 rounded-lg px-4 py-2 text-lg text-gray-800 tracking-wide font-semibold font-sans"
       >
         Login
