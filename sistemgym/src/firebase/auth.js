@@ -12,14 +12,10 @@ import { auth } from "./firebase";
 import store from "../redux/store";
 import {
   createUser,
+  // login,
   loginWithGoogle,
-  authenticateUserFromSession,
-  login
+  // authenticateUserFromSession,
 } from "../redux/actions/actions";
-
-
-
-
 
 export const doSignInWithGoogle = async () => {
   try {
@@ -36,15 +32,16 @@ export const doSignInWithGoogle = async () => {
     });
 
     if (response.ok) {
-     console.log( "Ingreso exitoso, redirigiendo..");
+      toast.success("Ingreso exitoso, redirigiendo..");
       const { theUser } = await response.json();
-      const { id, email, displayName, photoURL } = result.user;
+      const { photoURL } = result.user;
 
       const userInfo = {
-        id,
-        email,
-        name: displayName,
+        uid: theUser.uid,
+        email: theUser.email,
+        name: theUser.nombre,
         picture: photoURL,
+        rol: theUser.rol,
       };
 
       const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
@@ -58,6 +55,14 @@ export const doSignInWithGoogle = async () => {
       localStorage.setItem("authToken", token);
 
       store.dispatch(loginWithGoogle(userInfo));
+
+      setTimeout(() => {
+        if (userInfo.rol === "seller" || userInfo.rol === "admin") {
+          window.location.replace(`/dashboard`);
+        } else {
+          window.location.replace("/");
+        }
+      }, 2000);
     } else {
       toast.error("Error al ingresar");
       throw new Error("Error al enviar el token al backend");
@@ -82,36 +87,39 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
     
     // Obtener el token del usuario
     const token = await user.getIdToken();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Token:", token);
 
-    // Hacer la petición al backend con el token de autenticación
     const response = await fetch(`${rutaBack}/login/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
       },
-      body: JSON.stringify({ email: user.email }),
+      body: JSON.stringify({ token: token }),
     });
-
-    console.log("Respuesta del servidor:", response);
 
     if (response.ok) {
       toast.success("Ingreso exitoso, redirigiendo..");
-
-      // Obtener los datos del usuario para almacenarlos en el almacenamiento seguro
-      const userInfo = { 
-        uid: user.uid, // Obtener el uid del usuario de Firebase
-        email: user.email, // Obtener el email del usuario de Firebase
-        // ... otras propiedades que necesites ...
-      };
-
       const sellerData = await response.json();
       console.log(sellerData);
+      let userInfo;
+      if (sellerData.rol === "user") {
+        userInfo = {
+          uid: sellerData.uid,
+          email: sellerData.email,
+          name: sellerData.nombre,
+          direccion: sellerData.direccion,
+          provincia: sellerData.provincia,
+          cp: sellerData.cp,
+          rol: sellerData.rol,
+        };
+      } else {
+        userInfo = {
+          uid: sellerData.uid,
+          email: sellerData.email,
+          name: sellerData.nombre,
+          rol: sellerData.rol,
+        };
+      }
 
-      // Cifrar la información del usuario
       const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
       const hashedUserInfo = CryptoJS.AES.encrypt(
         JSON.stringify(userInfo),
@@ -122,11 +130,17 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
       sessionStorage.setItem("user", hashedUserInfo);
       localStorage.setItem("authToken", token);
 
-      // Hacer el dispatch de la acción login
-      store.dispatch(login(userInfo));
+      store.dispatch(loginWithGoogle(userInfo));
+
+      setTimeout(() => {
+        if (sellerData.rol === "seller" || sellerData.rol === "admin") {
+          window.location.replace(`/dashboard`);
+        } else {
+          window.location.replace("/");
+        }
+      }, 2000);
     } else {
       toast.error("Error al ingresar");
-      console.error("Error en la respuesta:", response.status, response.statusText);
       throw new Error("Error al enviar el token al backend");
     }
   } catch (error) {
@@ -173,7 +187,6 @@ export const createNewUser = async (newUser) => {
       email,
       password
     );
-    console.log(userCredential);
     const user = userCredential.user;
 
     let data = {
@@ -185,7 +198,6 @@ export const createNewUser = async (newUser) => {
       postalCode,
       role,
     };
-    // Despacha la acción para crear el usuario en tu backend y guardarlo en Google Sheets
     store.dispatch(createUser(data));
 
     toast.success("Usuario creado exitosamente");

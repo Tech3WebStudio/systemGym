@@ -1,72 +1,43 @@
 const { Router } = require("express");
 const loginRoutes = Router();
-const { User } = require("../db");
 const login = require("../controllers/loginControllers/login");
-const { verifyToken, isAdmin } = require("../middleware/authorization")
+const { verifyToken, isAdmin } = require("../middleware/authorization");
 const authThird = require("../controllers/loginControllers/thirdPartyAuth");
-
 loginRoutes.post("/", async (req, res) => {
   try {
-    console.log("Cuerpo de la solicitud:", req.body);
-    const { email, password } = req.body;
-    const { correctLogin, token, cookieOption } = await login(email, password); 
-    console.log("Token recibido:", token); // Mueve esta línea aquí
+    const { token } = req.body;
+    const decodedToken = await verifyToken(token);
+    const email = decodedToken.email;
+
+    const { clave, cookieOption } = await login(email);
     return res
       .status(200)
-      .json({ message: "Correct login", token, correctLogin });
+      .json({ message: "Correct login", clave, cookieOption });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 });
 
-loginRoutes.post('/third', async (req, res) => {
+loginRoutes.post("/third", async (req, res) => {
   try {
-    const { token } = req.body;  
-    // Asegúrate de que el token esté presente en el cuerpo
-
+    const { token } = req.body;
     if (!token) {
       return res.status(400).json({ message: "Token no proporcionado" });
     }
 
-    const decodedToken = await verifyToken(token); 
-     // Verifica el ID token con Firebase
-
-    // Si el token es válido, procede con el inicio de sesión
-    const { uid, email, name, picture } = decodedToken;
-
-
-    const theUser = await User.findOne({ where: { email } });
-    
-    if(theUser){
-      await theUser.update({
-        id_user: uid,
-        sign_in_provider: "google",
-        picture: picture || " ",
-      });
-      return res.json(theUser)
-    }else{
-      const newUser = await User.create({
-        id_user: uid,
-        name: name || " ",
-        email_verified: decodedToken.email_verified,
-        sign_in_provider: "google",
-        picture: picture || " ",
-        email: email, // Aquí se usa el valor de decodedToken.email
-        password: null, // Como es una autenticación con Google, no se necesita contraseña
-      });
-      console.log(newUser);
-      
-      return res.json(newUser);  // Envía el usuario al frontend
-
+    const decodedToken = await verifyToken(token);
+    const admin = await isAdmin(decodedToken.email);
+    if (admin) {
+      const theUser = await authThird(token);
+      return res.json(theUser);
     }
-    console.log("Email: ", email);
-console.log("Password: ", password);
-
   } catch (error) {
     console.error("Error en el inicio de sesión con Google:", error);
-    res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error interno del servidor", error: error.message });
   }
 });
-
 
 module.exports = loginRoutes;

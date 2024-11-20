@@ -3,20 +3,16 @@ const bcryptjs = require("bcryptjs");
 const mayuscName = require("../../helpers/mayuscName.js");
 
 const postUser = async (data) => {
-  let { name, email, password, role = "admin" } = data;
+  let { name, email, uid, role = "admin" } = data;
 
-  if (!name || !email || !password) throw new Error("Incomplete data");
+  if (!name || !email) throw new Error("Incomplete data");
 
   const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!regexEmail.test(email)) throw new Error("Invalid Email");
 
-  const regexPassword = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
-  if (!regexPassword.test(password)) throw new Error("Invalid Password");
-
   const regexName = /^[a-zA-ZáéíóúÁÉÍÓÚxñÑ\s'-]+$/;
   if (!regexName.test(name)) throw new Error("Invalid Name");
 
-  const hashPassword = await bcryptjs.hash(password, 10);
   const correctName = mayuscName(name);
   name = correctName;
 
@@ -31,12 +27,11 @@ const postUser = async (data) => {
   const newUser = await User.create({
     name,
     email,
-    password: hashPassword,
     role,
+    token: uid,
   });
 
   return newUser;
 };
-
 
 module.exports = postUser;

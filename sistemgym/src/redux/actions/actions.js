@@ -1,9 +1,11 @@
+import CryptoJS from "crypto-js";
 import axios from "axios";
 import { deleteSessionToken } from "../../components/delCookie";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import rutaBack from "./rutaBack";
+import toast from "react-hot-toast";
 
-export const AUTHENTICATE_USER_FROM_SESSION = "AUTHENTICATE_USER_FROM_SESSION"
+export const AUTHENTICATE_USER_FROM_SESSION = "AUTHENTICATE_USER_FROM_SESSION";
 export const REGISTER_SUCCESS = "REGISTER_SUCCESS";
 export const GET_USER_BY_ID = "GET_USER_BY_ID";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
@@ -16,14 +18,13 @@ export const AUTH_MEMBER = "AUTH_MEMBER";
 export const NEW_MEMBER = "NEW_MEMBER";
 export const ALL_MEMBERS = "ALL_MEMBERS";
 export const DELETED_MEMBER = "DELETED_MEMBER";
-export const CREATED_USER ="CREATED_USER"
-export const LOGIN_ERROR = 'LOGIN_ERROR';
-
+export const CREATED_USER = "CREATED_USER";
+export const LOGIN_ERROR = "LOGIN_ERROR";
 
 export const createUser = (data) => async (dispatch) => {
-  console.log(data);
   try {
-    const response = await instance.post(`${rutaBack}/user/create`, data);
+    const response = await axios.post(`${rutaBack}/user/`, data);
+    console.log(response);
     if (response.ok) {
       dispatch({
         type: CREATED_USER,
@@ -44,9 +45,7 @@ export const authenticateUserFromSession = () => {
         const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
         const bytes = CryptoJS.AES.decrypt(hashedUserInfo, secretKey);
         const userInfo = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        console.log("Información encriptada:", hashedUserInfo);
-        console.log("Bytes desencriptados:", bytes);
-        console.log("Información del usuario:", userInfo);
+
         dispatch({
           type: AUTHENTICATE_USER_FROM_SESSION,
           payload: userInfo,
@@ -62,16 +61,15 @@ export const authenticateUserFromSession = () => {
   };
 };
 
-export const login = (userInfo) => async (dispatch) => {
-  const endpoint = `${rutaBack}/login/`;
+export const login = (formData) => async (dispatch) => {
   try {
-    const response = await axios.post(endpoint, userInfo, {
+    const response = await axios.post(`${rutaBack}/login/`, formData, {
       withCredentials: true,
     });
-
-    // Verifica si la respuesta contiene la propiedad correctLogin
+    console.log(response);
     if (response.data.correctLogin) {
       const token = response.data.token;
+      console.log(token);
       dispatch({ type: LOGIN_SUCCESS, payload: response.data.user });
     }
   } catch (error) {
@@ -124,7 +122,6 @@ export const getUserById = (id) => {
     }
   };
 };
-
 
 export const updateUserAddress = (formUpdate, navigate) => async (dispatch) => {
   const endpoint = `${rutaBack}/user/update`;
@@ -202,31 +199,30 @@ export const newMember = (formData) => async (dispatch) => {
         },
         willClose: () => {
           clearInterval(timerInterval);
-        }
+        },
       }).then((result) => {
         /* Read more about handling dismissals below */
         if (result.dismiss === Swal.DismissReason.timer) {
-          window.location.href = '/members'
+          window.location.href = "/members";
         }
       });
       dispatch({
         type: NEW_MEMBER,
-        payload: response.data
-      })
+        payload: response.data,
+      });
     }
   } catch (error) {
     console.log(error.message);
-    
   }
 };
 
 export const authMember = (dni) => async () => {
   try {
     const response = await axios.post(`${rutaBack}/user/auth/member`, {
-      dni:dni
+      dni: dni,
     });
     console.log(response);
-    // if (response.data) { 
+    // if (response.data) {
     //   dispatch({
     //     type: AUTH_MEMBER,
     //     payload: response.data,
@@ -239,32 +235,30 @@ export const authMember = (dni) => async () => {
 
 export const getAllMembers = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${rutaBack}/user/members`)
+    const response = await axios.get(`${rutaBack}/user/members`);
     dispatch({
       type: ALL_MEMBERS,
-      payload: response.data
-    })
+      payload: response.data,
+    });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
   }
-}
+};
 
-export const deleteMember = (id) => async(dispatch) => {
+export const deleteMember = (id) => async (dispatch) => {
   try {
-    const response = await axios.delete(`${rutaBack}/user/member/${id}`)
-    console.log(response)
+    const response = await axios.delete(`${rutaBack}/user/member/${id}`);
+    console.log(response);
     dispatch({
       type: DELETED_MEMBER,
-      payload: response
-    })
+      payload: response,
+    });
   } catch (error) {
     Swal.fire({
-      title: 'Error!',
+      title: "Error!",
       text: `${error.message}`,
-      icon: 'error',
-      confirmButtonText: 'Cool'
-    })
+      icon: "error",
+      confirmButtonText: "Cool",
+    });
   }
-}
-
-
+};

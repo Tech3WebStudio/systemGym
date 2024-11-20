@@ -2,7 +2,6 @@ import { FormLogin } from "../components/Login/FormLogin";
 import gymImg from "../assets/gym.webp";
 import { Link } from "react-router-dom";
 
-
 export const Login = () => {
   return (
     <div className="bg-gray-100 flex justify-center items-center h-screen">
