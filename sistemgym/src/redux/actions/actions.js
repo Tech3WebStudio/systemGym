@@ -62,21 +62,24 @@ export const authenticateUserFromSession = () => {
   };
 };
 
-export const login = (formData) => async (dispatch) => {
+export const login = (userInfo) => async (dispatch) => {
   const endpoint = `${rutaBack}/login/`;
   try {
-    const response = await axios.post(endpoint, formData, {
+    const response = await axios.post(endpoint, userInfo, {
       withCredentials: true,
     });
+
+    // Verifica si la respuesta contiene la propiedad correctLogin
     if (response.data.correctLogin) {
       const token = response.data.token;
       dispatch({ type: LOGIN_SUCCESS, payload: response.data.user });
     }
   } catch (error) {
     console.log(error);
-    dispatch({type:"LOGIN_ERROR"})
-    }
+    dispatch({ type: "LOGIN_ERROR" });
+  }
 };
+
 
 export const logout = () => async (dispatch) => {
   try {

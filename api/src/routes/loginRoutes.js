@@ -4,7 +4,6 @@ const { User } = require("../db");
 const login = require("../controllers/loginControllers/login");
 const { verifyToken, isAdmin } = require("../middleware/authorization")
 const authThird = require("../controllers/loginControllers/thirdPartyAuth");
-const { sign } = require("jsonwebtoken");
 
 loginRoutes.post("/", async (req, res) => {
   try {
@@ -44,16 +43,25 @@ loginRoutes.post('/third', async (req, res) => {
         sign_in_provider: "google",
         picture: picture || " ",
       });
+      return res.json(theUser)
     }else{
-      theUser = await User.create({
+      const newUser = await User.create({
         id_user: uid,
         name: name || " ",
         email_verified: decodedToken.email_verified,
         sign_in_provider: "google",
         picture: picture || " ",
+        email: email, // Aquí se usa el valor de decodedToken.email
+        password: null, // Como es una autenticación con Google, no se necesita contraseña
       });
+      console.log(newUser);
+      
+      return res.json(newUser);  // Envía el usuario al frontend
+
     }
-    return res.json(theUser);  // Envía el usuario al frontend
+    console.log("Email: ", email);
+console.log("Password: ", password);
+
   } catch (error) {
     console.error("Error en el inicio de sesión con Google:", error);
     res.status(500).json({ message: "Error interno del servidor", error: error.message });
