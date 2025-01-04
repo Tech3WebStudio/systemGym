@@ -3,7 +3,7 @@ const { User } = require("../../db.js");
 
 const authThird = async (token) => {
   try {
-    const decodedToken = await admin.auth().verifyIdTokentoken();
+    const decodedToken = await admin.auth().verifyIdToken(token);
     const { uid, email, email_verified, name, picture } = decodedToken;
 
     const userExist = await User.findOne({

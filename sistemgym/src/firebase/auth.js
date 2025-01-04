@@ -16,6 +16,7 @@ import {
   loginWithGoogle,
   // authenticateUserFromSession,
 } from "../redux/actions/actions";
+import { log } from "console";
 
 export const doSignInWithGoogle = async () => {
   try {
@@ -35,6 +36,8 @@ export const doSignInWithGoogle = async () => {
       toast.success("Ingreso exitoso, redirigiendo..");
       const { theUser } = await response.json();
       const { photoURL } = result.user;
+      console.log(theUser.uid);
+      
 
       const userInfo = {
         uid: theUser.uid,
@@ -75,17 +78,12 @@ export const doSignInWithGoogle = async () => {
 
 export const doSignInWithEmailAndPassword = async (email, password) => {
   try {
-    // Validar que los valores de correo y contraseña no sean vacíos
-    if (!email || !password) {
-      toast.error("Por favor ingresa tu correo y contraseña.");
-      return;
-    }
-
-    // Intentar iniciar sesión con Firebase Authentication
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
     const user = userCredential.user;
-    
-    // Obtener el token del usuario
     const token = await user.getIdToken();
 
     const response = await fetch(`${rutaBack}/login/`, {
@@ -121,12 +119,12 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
       }
 
       const secretKey = import.meta.env.VITE_SECRET_KEY_BYCRYPT;
+
       const hashedUserInfo = CryptoJS.AES.encrypt(
         JSON.stringify(userInfo),
         secretKey
       ).toString();
 
-      // Almacenar la información cifrada en sessionStorage y localStorage
       sessionStorage.setItem("user", hashedUserInfo);
       localStorage.setItem("authToken", token);
 
@@ -146,18 +144,8 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
   } catch (error) {
     console.error("Error al ingresar:", error);
     toast.error("Error al ingresar");
-
-    // Manejo de errores según el tipo de error
-    if (error.code === "auth/user-not-found") {
-      toast.error("El usuario no existe");
-    } else if (error.code === "auth/wrong-password") {
-      toast.error("La contraseña es incorrecta");
-    } else {
-      toast.error("Error desconocido en el inicio de sesión");
-    }
   }
 };
-
 
 /*export const createNewSeller = async (newSeller) => {
   try {
