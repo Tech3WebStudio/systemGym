@@ -10,7 +10,7 @@ const authThird = async (token) => {
       where: { email },
     });
 
-    if (userExist) throw new Error("The user already exists");
+    if (userExist) return userExist
 
     const [theUser, created] = await User.findOrCreate({
       where: { email },
